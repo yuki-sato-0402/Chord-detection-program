@@ -122,41 +122,53 @@ else{chord_out=' ';}
    a2=micros();
         k=chord;
 
-  // int array[5];
-  // int i;
+  
+  } 
+       
+}
 
-  // for (i = 1; i <= 5; i++){
-  //   array[i - 1] = k;
-  // }
 
-  //  int get_mode(const int* array, size_t size){
-  //   assert(array != NULL);
-  //   assert(size > 0);
+   int get_mode(const int* array){
+    assert(array != NULL);
+    assert(size > 0);
+    int array[5];
+    int i;
+    int mode;              // これまでに調べた中での最頻値
+    int count_max = 0;     // これまでに調べた登場回数の中で最大のもの
+    
+    size_t size = 5;
+    
 
-  //   int mode;              // これまでに調べた中での最頻値
-  //   int count_max = 0;     // これまでに調べた登場回数の中で最大のもの
+  for (i = 1; i <= 5; i++){
+    array[i - 1] = k;
+  }
 
-  //   for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
 
-  //       // array[i] の値の登場回数を調べる
-  //       int count = 1;
-  //       for (size_t j = i + 1; j < size; ++j) {
-  //           if (array[i] == array[j]) {
-  //               ++count;
-  //           }
-  //       }
+        // array[i] の値の登場回数を調べる
+        int count = 1;
+        for (size_t j = i + 1; j < size; ++j) {
+            if (array[i] == array[j]) {
+                ++count;
+            }
+        }
 
-  //       // これまでの最大の登場回数よりも多かったら、更新する
-  //       if (count_max <= count) {
-  //           count_max = count;
-  //           mode = array[i];
-  //       }
-  //   }
-  //   return mode;
-  //   k = mode;
-  //  }
+        // これまでの最大の登場回数よりも多かったら、更新する
+        if (count_max <= count) {
+            count_max = count;
+            mode = array[i];
+        }
+    }
+    return mode;
+    k = mode;
+   }
 
-       M5.Lcd.setCursor(10, 10);
+
+// Here "chord" variable has value of detected chord,
+// 0-11 defines all majot chord from C,C#,D,D#,.. B
+//12-23 defines all minor chord from Cm,C#m,Dm,D#m,.. Bm
+
+      M5.Lcd.setCursor(10, 10);
     if (k == 0) {
       M5.Lcd.print('C');
       M5.Lcd.println(chord_out);
