@@ -21,8 +21,13 @@ float f_peaks[8]; // top 8 frequencies peaks in descending order
 // this code won't work for any board having RAM less than 2kb,
 // More accurate detection can be carried out on more powerful borad by increasing sample size
 
+ 
+  int j=0,k=0;
+  char chord_out;
+  int chord=j;
 
-void Chord_det()
+
+int Chord_det()
 { 
   long unsigned int a1,b;
   float a;
@@ -55,9 +60,9 @@ if(sum2-sum1>3){
              
               for(int i=0;i<12;i++){in[i]=0;}
 
-int j=0,k=0; //below loop will convert frequency value to note 
+ //below loop will convert frequency value to note 
 
-
+// int& j=0,k=0;
        for(int i=0; i<8;i++)
            {   
            Serial.print(i); 
@@ -107,41 +112,37 @@ for (int i=0;i<12;i++)
 for (int i=0;i<24;i++)
 {
 in[i]=in[i+20];
-if(k<in[i]){k=in[i];j=i;}   // picking chord with max possiblity
+if(k<in[i]){
+  k=in[i];
+  j=i;
+  }   // picking chord with max possiblity
 }
-char chord_out;
-int chord=j;
-if(chord>11){chord=chord-12;chord_out='m';} //Mojor-minor check
-else{chord_out=' ';}
+//  char chord_out;
+//  int chord=j;
+     
+  if(chord>11){chord=chord-12;chord_out='m';} //Mojor-minor check
+  else{chord_out=' ';}
 
-// Here "chord" variable has value of detected chord,
-// 0-11 defines all majot chord from C,C#,D,D#,.. B
-//12-23 defines all minor chord from Cm,C#m,Dm,D#m,.. Bm
+     a2=micros();
+     k=chord;
 
-  
-   a2=micros();
-        k=chord;
 
   
   } 
-       
+  return k;
 }
 
 
    int get_mode(const int* array){
+    size_t size = 5;
     assert(array != NULL);
     assert(size > 0);
-    int array[5];
-    int i;
+   
     int mode;              // これまでに調べた中での最頻値
     int count_max = 0;     // これまでに調べた登場回数の中で最大のもの
     
-    size_t size = 5;
+   
     
-
-  for (i = 1; i <= 5; i++){
-    array[i - 1] = k;
-  }
 
     for (size_t i = 0; i < size; ++i) {
 
@@ -160,7 +161,6 @@ else{chord_out=' ';}
         }
     }
     return mode;
-    k = mode;
    }
 
 
@@ -168,14 +168,18 @@ else{chord_out=' ';}
 // 0-11 defines all majot chord from C,C#,D,D#,.. B
 //12-23 defines all minor chord from Cm,C#m,Dm,D#m,.. Bm
 
+   void Chord_output(int c){
+
+    
+  
       M5.Lcd.setCursor(10, 10);
-    if (k == 0) {
+    if (c == 0) {
       M5.Lcd.print('C');
       M5.Lcd.println(chord_out);
       Serial.print('C');
       Serial.println(chord_out);
     }
-    if (k == 1) {
+    if (c == 1) {
       M5.Lcd.print('C');
       M5.Lcd.print('#');
       M5.Lcd.println(chord_out);
@@ -183,13 +187,13 @@ else{chord_out=' ';}
       Serial.print('#');
       Serial.println(chord_out);
     }
-    if (k == 2) {
+    if (c == 2) {
       M5.Lcd.print('D');
       M5.Lcd.println(chord_out);
       Serial.print('D');
       Serial.println(chord_out);
     }
-    if (k == 3) {
+    if (c == 3) {
       M5.Lcd.print('D');
       M5.Lcd.print('#');
       M5.Lcd.println(chord_out);
@@ -197,19 +201,19 @@ else{chord_out=' ';}
       Serial.print('#');
       Serial.println(chord_out);
     }
-    if (k == 4) {
+    if (c == 4) {
       M5.Lcd.print('E');
       M5.Lcd.println(chord_out);
       Serial.print('E');
       Serial.println(chord_out);
     }
-    if (k == 5) {
+    if (c == 5) {
       M5.Lcd.print('F');
       M5.Lcd.println(chord_out);
       Serial.print('F');
       Serial.println(chord_out);
     }
-    if (k == 6) {
+    if (c == 6) {
       M5.Lcd.print('F');
       M5.Lcd.print('#');
       M5.Lcd.println(chord_out);
@@ -217,13 +221,13 @@ else{chord_out=' ';}
       Serial.print('#');
       Serial.println(chord_out);
     }
-    if (k == 7) {
+    if (c == 7) {
       M5.Lcd.print('G');
       M5.Lcd.println(chord_out);
       Serial.print('G');
       Serial.println(chord_out);
     }
-    if (k == 8) {
+    if (c == 8) {
       M5.Lcd.print('G');
       M5.Lcd.print('#');
       M5.Lcd.println(chord_out);
@@ -231,13 +235,13 @@ else{chord_out=' ';}
       Serial.print('#');
       Serial.println(chord_out);
     }
-    if (k == 9) {
+    if (c == 9) {
       M5.Lcd.print('A');
       M5.Lcd.println(chord_out);
       Serial.print('A');
       Serial.println(chord_out);
     }
-    if (k == 10) {
+    if (c == 10) {
       M5.Lcd.print('A');
       M5.Lcd.print('#');
       M5.Lcd.println(chord_out);
@@ -245,16 +249,14 @@ else{chord_out=' ';}
       Serial.print('#');
       Serial.println(chord_out);
     }
-    if (k == 11) {
+    if (c == 11) {
       M5.Lcd.print('B');
       M5.Lcd.println(chord_out);
       Serial.print('B');
       Serial.println(chord_out);
     }
+   }
 
-  } 
-       
-}
 
 //-----------------------------FFT Function----------------------------------------------//
 // Documentation on EasyFFT:https://www.instructables.com/member/abhilash_patel/instructables/
@@ -311,7 +313,7 @@ float e,c,s,tr,ti;
           s=sin(e*j); 
           n1=j;
           
-                for(int k=0;k<i11;k++)
+                for(int k1=0;k1<i11;k1++)
                  {
                  tr=c*out_r[i10+n1]-s*out_im[i10+n1];
                  ti=s*out_r[i10+n1]+c*out_im[i10+n1];
@@ -394,6 +396,19 @@ M5.Lcd.setRotation(3);
 
 void loop() 
 { 
-  Chord_det();
+ int array[5];
+ int i;
+ int k;
+ int c;
+
+ k = Chord_det();
+
+   for (i = 1; i <= 5; i++){
+    array[i - 1] = k;
+  }
+  
+ c = get_mode(array);
+
+ Chord_output(c);
    //delay(500);        
 }
