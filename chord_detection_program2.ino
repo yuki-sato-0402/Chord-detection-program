@@ -21,10 +21,7 @@ float f_peaks[8]; // top 8 frequencies peaks in descending order
 // this code won't work for any board having RAM less than 2kb,
 // More accurate detection can be carried out on more powerful borad by increasing sample size
 
- 
-  int j=0,k=0;
-  char chord_out;
-  int chord=j;
+
 
 
 int Chord_det()
@@ -60,9 +57,9 @@ if(sum2-sum1>3){
              
               for(int i=0;i<12;i++){in[i]=0;}
 
- //below loop will convert frequency value to note 
+ int j=0,k=0;//below loop will convert frequency value to note 
 
-// int& j=0,k=0;
+j=0,k=0;
        for(int i=0; i<8;i++)
            {   
            Serial.print(i); 
@@ -90,7 +87,6 @@ if(sum2-sum1>3){
               in[k]=in[k]+(8-i);
            }
            Serial.print('\n');    
-
 k=0;j=0;
           for(int i=0;i<12;i++)
              {
@@ -120,16 +116,11 @@ if(k<in[i]){
 //  char chord_out;
 //  int chord=j;
      
-  if(chord>11){chord=chord-12;chord_out='m';} //Mojor-minor check
-  else{chord_out=' ';}
 
-     a2=micros();
-     k=chord;
-
-
-  
-  } 
+  k=j;
   return k;
+  } 
+ 
 }
 
 
@@ -169,12 +160,20 @@ if(k<in[i]){
 //12-23 defines all minor chord from Cm,C#m,Dm,D#m,.. Bm
 
    void Chord_output(int c){
+char chord_out;
 
-    
-  
+if(c>11){
+    c=c-12;
+    chord_out='m';
+    } //Mojor-minor check
+  else{
+    chord_out=' ';
+    }
+   a2=micros();
       M5.Lcd.setCursor(10, 10);
     if (c == 0) {
       M5.Lcd.print('C');
+      M5.Lcd.print(' ');
       M5.Lcd.println(chord_out);
       Serial.print('C');
       Serial.println(chord_out);
@@ -189,6 +188,7 @@ if(k<in[i]){
     }
     if (c == 2) {
       M5.Lcd.print('D');
+      M5.Lcd.print(' ');
       M5.Lcd.println(chord_out);
       Serial.print('D');
       Serial.println(chord_out);
@@ -203,12 +203,14 @@ if(k<in[i]){
     }
     if (c == 4) {
       M5.Lcd.print('E');
+      M5.Lcd.print(' ');
       M5.Lcd.println(chord_out);
       Serial.print('E');
       Serial.println(chord_out);
     }
     if (c == 5) {
       M5.Lcd.print('F');
+      M5.Lcd.print(' ');
       M5.Lcd.println(chord_out);
       Serial.print('F');
       Serial.println(chord_out);
@@ -223,6 +225,7 @@ if(k<in[i]){
     }
     if (c == 7) {
       M5.Lcd.print('G');
+      M5.Lcd.print(' ');
       M5.Lcd.println(chord_out);
       Serial.print('G');
       Serial.println(chord_out);
@@ -237,6 +240,7 @@ if(k<in[i]){
     }
     if (c == 9) {
       M5.Lcd.print('A');
+      M5.Lcd.print(' ');
       M5.Lcd.println(chord_out);
       Serial.print('A');
       Serial.println(chord_out);
@@ -251,10 +255,12 @@ if(k<in[i]){
     }
     if (c == 11) {
       M5.Lcd.print('B');
+      
       M5.Lcd.println(chord_out);
       Serial.print('B');
       Serial.println(chord_out);
     }
+     Serial.println(c);
    }
 
 
@@ -401,14 +407,15 @@ void loop()
  int k;
  int c;
 
- k = Chord_det();
+for (i = 1; i <= 5; i++){
+   k = Chord_det();
 
-   for (i = 1; i <= 5; i++){
-    array[i - 1] = k;
+   array[i - 1] = k;
+
   }
   
- c = get_mode(array);
 
+ c = get_mode(array);
  Chord_output(c);
    //delay(500);        
 }
