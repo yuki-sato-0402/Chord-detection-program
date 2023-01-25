@@ -8,7 +8,8 @@
 long unsigned int a2;
 
 //---------------------------------------------------------------------------//
-int  in[128];
+//              0,1, 2, 3 ,4 ,5 ,6 , 7  ,8  ,9  ,10 ,11 ,12
+int  in[128]; //C,C#,D ,D#,E ,F ,F#, G  ,G# ,A  ,A# ,B  ,C
 byte NoteV[13]={8,23,40,57,76,96,116,138,162,187,213,241,255};
 float f_peaks[8]; // top 8 frequencies peaks in descending order
 //---------------------------------------------------------------------------//
@@ -51,12 +52,13 @@ sampling= 128000000/(b-a1);  // real time sampling frequency
 //for very low or no amplitude, this code wont start
 //it takes very small aplitude of sound to initiate for value sum2-sum1>3, 
 //change sum2-sum1 threshold based on requirement
-if(sum2-sum1>3){   
+if(sum2-sum1>7){   
        FFT(128,sampling);        //EasyFFT based optimised  FFT code
         
              
-              for(int i=0;i<12;i++){in[i]=0;}
-
+              for(int i=0;i<12;i++){
+                in[i]=0;
+                } 
  int j=0,k=0;//below loop will convert frequency value to note 
 
 j=0,k=0;
@@ -65,11 +67,11 @@ j=0,k=0;
            Serial.print(i); 
            Serial.print(":"); 
            Serial.print(f_peaks[i]);   
-           Serial.print("\t"); 
+           Serial.print(" "); 
 
            if(f_peaks[i]>1040){f_peaks[i]=0;}
            if(f_peaks[i]>=65.4   && f_peaks[i]<=130.8) {f_peaks[i]=255*((f_peaks[i]/65.4)-1);}//C2~C3
-           if(f_peaks[i]>=130.8  && f_peaks[i]<=261.6) {f_peaks[i]=255*((f_peaks[i]/130.8)-1);}//C3~C4
+           if(f_peaks[i]>=130.8  && f_peaks[i]<=261.6) {f_peaks[i]=255*((f_peaks[i]/130.8)-1);}//C3~C4 A3=220:173.89
            if(f_peaks[i]>=261.6  && f_peaks[i]<=523.25){f_peaks[i]=255*((f_peaks[i]/261.6)-1);}//C4~C5 A4=440:173.89
            if(f_peaks[i]>=523.25 && f_peaks[i]<=1046)  {f_peaks[i]=255*((f_peaks[i]/523.25)-1);}//C5~C6
            if(f_peaks[i]>=1046 && f_peaks[i]<=2093)  {f_peaks[i]=255*((f_peaks[i]/1046)-1);}//C6~C7
@@ -77,49 +79,112 @@ j=0,k=0;
            j=1;k=0;
          while(j==1)
               {
-              if(f_peaks[i]<=NoteV[k]){f_peaks[i]=k;j=0;}
+              if(f_peaks[i]<=NoteV[k]){
+                f_peaks[i]=k;
+                j=0;
+                }
               k++;  // a note with max peaks (harmonic) with amplitude priority is selected
               if(k>15){j=0;}
               }
 
-              if(f_peaks[i]==12){f_peaks[i]=0;}
+              if(f_peaks[i]==12){
+                f_peaks[i]=0;
+                }
               k=f_peaks[i];
-              in[k]=in[k]+(8-i);
+              in[k]=in[k]+(8-i);  //in[9]+8,in[4]+7,in[0]+6,,,,in[9]
+              Serial.print(k);// Am:k=9 k=4 k=0
+               Serial.print("(k)");
+               Serial.print(':');
+              Serial.print(in[k]);
+              Serial.print(' '); //Am 21
+               Serial.print('\n');    
            }
            Serial.print('\n');    
 k=0;j=0;
           for(int i=0;i<12;i++)
              {
-              if(k<in[i]){k=in[i];j=i;}  //Max value detection
+              if(k<in[i]){
+                 Serial.print(k);
+             Serial.print("(k)");
+                k=in[i];  
+             Serial.print(':');
+             Serial.print(in[i]);
+             Serial.print("(in[i])");
+              Serial.print(':');
+             Serial.print(i);
+             Serial.print('\n');
+              j=i;
+                }
+  //Max value detection A:i=9が出る
              }
 
+             
           for(int i=0;i<8;i++)
              {
               in[12+i]=in[i];
              }        
 
+            
 for (int i=0;i<12;i++)
 {
-  in[20+i]=in[i]*in[i+4]*in[i+7];
-  in[32+i]=in[i]*in[i+3]*in[i+7];   //all chord check
+  in[20+i]=in[i]*in[i+4]*in[i+7]*in[i+11]; //M7
+  in[32+i]=in[i]*in[i+3]*in[i+7]*in[i+10];  //m7 
+  in[44+i]=in[i]*in[i+4]*in[i+7]*in[i+10]; //7
+  in[56+i]=in[i]*in[i+3]*in[i+6]*in[i+10]; //m7(b5)
+  Serial.print(i);
+  Serial.print(':');
+  Serial.print(in[i]);
+  Serial.print(' ');
+  Serial.print(i+3);
+  Serial.print(':');
+  Serial.print(in[i+3]);
+  Serial.print(' ');
+  Serial.print(i+7);
+  Serial.print(':');
+  Serial.print(in[i+7]);
+  Serial.print(' ');
+  Serial.print(20+i); 
+  Serial.print(':');  
+  Serial.print(in[20+i]); 
+   Serial.print('&');  
+    Serial.print(32+i); 
+  Serial.print(':');  
+   Serial.print(in[32+i]);
+    Serial.print('&');    
+   Serial.print(k); 
+   Serial.print('\n'); 
 }
 
-
-for (int i=0;i<24;i++)
+Serial.print('\n');
+for (int i=0;i<48;i++)
 {
 in[i]=in[i+20];
 if(k<in[i]){
+  Serial.print(k);
+  Serial.print("(k)");
+  Serial.print(':');  
+  Serial.print(in[i]);
+  Serial.print("(in[i])");
+   Serial.print(':');
+  Serial.print(i);
+  Serial.print("(i)");
+  Serial.print(' ');
+
   k=in[i];
   j=i;
   }   // picking chord with max possiblity
 }
-//  char chord_out;
-//  int chord=j;
-     
+
+//  Serial.print(j);
+//   Serial.print(':');    
+//   Serial.print(k);
+//   Serial.print('\n');
 
   k=j;
   return k;
-  } 
+  } else{
+  ;
+  }
  
 }
 
@@ -160,15 +225,18 @@ if(k<in[i]){
 //12-23 defines all minor chord from Cm,C#m,Dm,D#m,.. Bm
 
    void Chord_output(int c){
-char chord_out;
+String chord_out;
 
-if(c>11){
+if(c>11){//Mojor-minor check
     c=c-12;
-    chord_out='m';
-    } //Mojor-minor check
-  else{
-    chord_out=' ';
-    }
+    chord_out="m7";
+}else if(c>23){
+    chord_out="7";
+}else if(c>35){
+    chord_out="m7(b5)";
+}else{
+    chord_out="M7";
+}
    a2=micros();
       M5.Lcd.setCursor(10, 10);
     if (c == 0) {
@@ -260,7 +328,7 @@ if(c>11){
       Serial.print('B');
       Serial.println(chord_out);
     }
-     Serial.println(c);
+     Serial.println("\n");
    }
 
 
@@ -400,22 +468,16 @@ M5.Lcd.setRotation(3);
 }
 
 
+int array[5];
+int i;
+
 void loop() 
 { 
- int array[5];
- int i;
- int k;
- int c;
-
-for (i = 1; i <= 5; i++){
-   k = Chord_det();
-
-   array[i - 1] = k;
-
-  }
-  
-
- c = get_mode(array);
- Chord_output(c);
-   //delay(500);        
+ 	int c;
+ 	int k = Chord_det();
+  i++;
+	i%=5;
+  array[i] = k;
+	c = get_mode(array);
+	Chord_output(c);
 }
